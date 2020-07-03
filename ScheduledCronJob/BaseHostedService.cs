@@ -12,7 +12,7 @@ namespace ScheduledCronJob
     {
         [CanBeNull]
         private Task _executingTask;
-        
+
         [CanBeNull]
         private CancellationTokenSource _cts;
 
@@ -40,7 +40,7 @@ namespace ScheduledCronJob
             _cts.Cancel();
 
             await Task.WhenAny(_executingTask, Task.Delay(-1, cancellationToken));
-            
+
             cancellationToken.ThrowIfCancellationRequested();
         }
 

@@ -20,13 +20,14 @@ namespace ScheduledCronJob.ScheduledTask
             DateTime referenceTimeUtc = DateTime.UtcNow;
 
             _scheduledTasks = scheduledTasks.Select(scheduledTask =>
-                                                        new SchedulerTaskWrapper(CrontabSchedule.Parse(scheduledTask.Schedule),
-                                                                                 scheduledTask,
-                                                                                 referenceTimeUtc));
+                                                        new SchedulerTaskWrapper(
+                                                            CrontabSchedule.Parse(scheduledTask.Schedule),
+                                                            scheduledTask,
+                                                            referenceTimeUtc));
         }
-        
+
         public event EventHandler<UnobservedTaskExceptionEventArgs> UnobservedTaskException;
-        
+
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             while(!cancellationToken.IsCancellationRequested)
@@ -36,12 +37,13 @@ namespace ScheduledCronJob.ScheduledTask
                 await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
             }
         }
-        
+
         private async Task ExecuteOnceAsync(CancellationToken cancellationToken)
         {
-            TaskFactory taskFactory      = new TaskFactory(TaskScheduler.Current);
+            TaskFactory taskFactory = new TaskFactory(TaskScheduler.Current);
 
-            List<SchedulerTaskWrapper> tasksThatShouldRun = _scheduledTasks.Where(t => t.ShouldRun()).ToList();
+            List<SchedulerTaskWrapper> tasksThatShouldRun = _scheduledTasks.Where(t => t.ShouldRun())
+                                                                           .ToList();
 
             foreach(SchedulerTaskWrapper taskThatShouldRun in tasksThatShouldRun)
             {
@@ -75,19 +77,19 @@ namespace ScheduledCronJob.ScheduledTask
         {
             public SchedulerTaskWrapper(CrontabSchedule schedule, IScheduledTask task, DateTime referenceTimeUtc)
             {
-                Schedule = schedule;
-                Task = task;
+                Schedule       = schedule;
+                Task           = task;
                 NextRunTimeUtc = referenceTimeUtc;
             }
-            
+
             [NotNull]
             public CrontabSchedule Schedule { get; }
-            
+
             [NotNull]
             public IScheduledTask Task { get; }
-            
+
             public DateTime LastRunTimeUtc { get; private set; }
-            
+
             public DateTime NextRunTimeUtc { get; private set; }
 
             public void Increment()
