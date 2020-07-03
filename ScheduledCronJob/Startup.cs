@@ -24,6 +24,8 @@ namespace ScheduledCronJob
             services.AddControllers();
 
             services.AddHostedService<ScheduledHostedServices>();
+
+            services.AddSingleton<IScheduledTask, Example.ScheduledTask>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
